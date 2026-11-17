@@ -1,0 +1,13 @@
+{
+  "name": "rolefindr-extension",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc && cp manifest.json dist/",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "chrome-types": "^0.1.285"
+  }
+}

@@ -1,0 +1,38 @@
+# docker-compose.yml
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment: { POSTGRES_DB: rolefindr, POSTGRES_USER: rolefindr, POSTGRES_PASSWORD: rolefindr }
+    ports: [ "5432:5432" ]
+    volumes: [ pgdata:/var/lib/postgresql/data ]
+    healthcheck: { test: [ "CMD-SHELL", "pg_isready -U rolefindr" ], interval: 5s, retries: 10 }
+  redis:
+    image: redis:7
+    healthcheck: { test: [ "CMD", "redis-cli", "ping" ], interval: 5s, retries: 10 }
+  minio:
+    image: quay.io/minio/aistor/minio
+    command: server /data --console-address ":9001"
+    environment: { MINIO_ROOT_USER: minio, MINIO_ROOT_PASSWORD: minio12345 }
+    ports: [ "9000:9000", "9001:9001" ]
+    volumes: [ miniodata:/data ]
+  backend: &backend
+    build: ./backend
+    env_file: .env
+    depends_on: { db: { condition: service_healthy }, redis: { condition: service_healthy } }
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes: [ "./backend:/app" ]
+    ports: [ "8000:8000" ]
+  worker:
+    <<: *backend
+    command: celery -A config worker -l info
+    ports: []
+  beat:
+    <<: *backend
+    command: celery -A config beat -l info
+    ports: []
+  web:
+    build: ./web
+    environment: { NEXT_PUBLIC_API_URL: "http://localhost:8000" }
+    ports: [ "3000:3000" ]
+    volumes: [ "./web:/app", "/app/node_modules" ]
+volumes: { pgdata: {}, miniodata: {} }

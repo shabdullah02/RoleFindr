@@ -1,0 +1,11 @@
+# backend/requirements.txt  (pin exact versions after `pip install`; verify current releases)
+Django>=5.1,<5.3
+djangorestframework
+django-environ
+django-cors-headers
+psycopg[binary]
+celery[redis]
+gunicorn
+pytest
+pytest-django
+ruff
