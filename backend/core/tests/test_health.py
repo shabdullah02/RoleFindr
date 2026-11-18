@@ -1,7 +1,9 @@
 # backend/core/tests/test_health.py
 import pytest
 from django.db import connection
+
 from core.tasks import ping
+
 
 @pytest.mark.django_db
 def test_health(client):
