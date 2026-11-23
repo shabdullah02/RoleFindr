@@ -11,10 +11,19 @@ def ingest_linkedin(term, location="Pakistan", n=50, source=None, scrape=None) -
     for nj in source.fetch(term, location, n, scrape=scrape):
         _, c = Job.objects.update_or_create(
             source="linkedin", external_id=nj.external_id,
-            defaults=dict(  # apply_method deliberately omitted
-                company=None, company_name=nj.company_name, title=nj.title, location=nj.location, remote=nj.remote,
-                url=nj.url, apply_url=nj.apply_url, description=nj.description,
-                posted_at=nj.posted_at, status=Job.Status.OPEN, fetched_at=now))
+            defaults={
+    "company": None,
+    "company_name": nj.company_name,
+    "title": nj.title,
+    "location": nj.location,
+    "remote": nj.remote,
+    "url": nj.url,
+    "apply_url": nj.apply_url,
+    "description": nj.description,
+    "posted_at": nj.posted_at,
+    "status": Job.Status.OPEN,
+    "fetched_at": now,
+})
         created += c
         updated += not c
     return {"created": created, "updated": updated}

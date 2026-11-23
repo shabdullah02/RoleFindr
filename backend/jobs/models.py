@@ -16,7 +16,12 @@ class Company(models.Model):
     active = models.BooleanField(default=True)
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["ats_type", "slug"], name="uniq_company_ats_slug")]
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["ats_type", "slug"],
+                name="uniq_company_ats_slug",
+            )
+        ]
 
     def __str__(self):
         return f"{self.name} ({self.ats_type}:{self.slug})"
@@ -50,8 +55,15 @@ class Job(models.Model):
     # embedding (vector) is added in slice 3 with the pgvector Python package
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["source", "external_id"], name="uniq_job_source_external")]
-        indexes = [models.Index(fields=["company", "status"])]
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["source", "external_id"],
+                name="uniq_job_source_external",
+            )
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(fields=["company", "status"]),
+        ]
 
 class Profile(models.Model):
     class RemotePref(models.TextChoices):
@@ -82,5 +94,9 @@ class JobMatch(models.Model):
     scored_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["user", "job", "resume_version"],
-                                               name="uniq_jobmatch_user_job_resume")]
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["user", "job", "resume_version"],
+                name="uniq_jobmatch_user_job_resume",
+            )
+        ]

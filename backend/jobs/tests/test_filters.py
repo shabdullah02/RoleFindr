@@ -5,8 +5,13 @@ from jobs.services.filters import check_job, norm
 
 
 def job(**kw):
-    d = dict(title="Software Engineer", company_name="Acme", location="Karāchi, Sindh, Pakistan",
-             remote=False, description="Build things")
+    d = {
+        "title": "Software Engineer",
+        "company_name": "Acme",
+        "location": "Karāchi, Sindh, Pakistan",
+        "remote": False,
+        "description": "Build things",
+    }
     d.update(kw)
     return NS(**d)
 

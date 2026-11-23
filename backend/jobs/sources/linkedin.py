@@ -1,6 +1,6 @@
 import os
 import re
-from datetime import datetime, time, timezone
+from datetime import UTC, datetime, time
 
 import pandas as pd
 
@@ -38,7 +38,7 @@ class LinkedInGuestSource:
             return None
         direct = _s(r.get("job_url_direct"))
         d = r.get("date_posted")
-        posted = (datetime.combine(d, time.min, tzinfo=timezone.utc)
+        posted = (datetime.combine(d, time.min, tzinfo=UTC)
                   if d is not None and not pd.isna(d) and hasattr(d, "year") else None)
         loc = _s(r.get("location"))
         return NormalizedJob(

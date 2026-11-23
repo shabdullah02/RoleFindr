@@ -10,4 +10,9 @@ class MasterResume(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["user", "version"], name="uniq_master_resume_version")]
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["user", "version"],
+                name="uniq_master_resume_version",
+            )
+        ]

@@ -1,6 +1,6 @@
 # backend/jobs/sources/lever.py  (replaces previous version)
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import requests
 
@@ -51,7 +51,7 @@ def _normalize(p: dict) -> NormalizedJob:
         url=p["hostedUrl"],
         apply_url=p.get("applyUrl") or p["hostedUrl"],
         description=p.get("descriptionPlain") or "",
-        posted_at=datetime.fromtimestamp(created / 1000, tz=timezone.utc) if created else None,
+        posted_at=datetime.fromtimestamp(created / 1000, tz=UTC) if created else None,
     )
 
 
