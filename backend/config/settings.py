@@ -11,10 +11,13 @@ DEBUG = env("DJANGO_DEBUG")
 ALLOWED_HOSTS = ["*"] if DEBUG else env.list("ALLOWED_HOSTS", default=[])
 
 INSTALLED_APPS = [
+    "resumes",
+    "jobs",
     "django.contrib.contenttypes", "django.contrib.auth", "django.contrib.sessions",
     "django.contrib.messages", "django.contrib.staticfiles", "django.contrib.admin",
-    "corsheaders", "rest_framework", "core",
+    "corsheaders", "rest_framework", "accounts", "core",
 ]
+AUTH_USER_MODEL = "accounts.User"
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
