@@ -64,3 +64,7 @@ build/
 Thumbs.db
 *.swp
 *.swo
+
+# mds
+job-application-platform-architecture.md
+context.mdbackend/media/

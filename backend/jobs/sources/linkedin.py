@@ -19,7 +19,7 @@ class LinkedInGuestSource:
     name = "linkedin"
 
     def fetch(self, term, location="Pakistan", n=50, scrape=None,
-              fetch_description=True) -> list[NormalizedJob]:
+              fetch_description=False) -> list[NormalizedJob]:
         if scrape is None:
             from jobspy import scrape_jobs as scrape
         proxies = [x for x in os.environ.get("LINKEDIN_PROXIES", "").split(",") if x] or None

@@ -35,3 +35,24 @@ def test_empty_result_raises_instead_of_silently_succeeding():
     from jobs.sources.linkedin import LinkedInBlocked
     with pytest.raises(LinkedInBlocked):
         ingest_linkedin("python", scrape=fake([]))
+
+
+@pytest.mark.django_db
+def test_reingest_keeps_fetched_description():
+    from jobs.models import Job
+    from jobs.sources.base import NormalizedJob
+
+    def nj(desc):
+        return NormalizedJob(external_id="1", title="SE", location="Karachi", remote=False,
+                             url="http://x", apply_url="", description=desc, posted_at=None)
+
+    class Src:
+        def __init__(self, d):
+            self.d = d
+
+        def fetch(self, *a, **k):
+            return [nj(self.d)]
+
+    ingest_linkedin("x", source=Src("Full text"))
+    ingest_linkedin("x", source=Src(""))
+    assert Job.objects.get(external_id="1").description == "Full text"

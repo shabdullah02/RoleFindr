@@ -1,6 +1,7 @@
 # backend/jobs/models.py
 from django.conf import settings
 from django.db import models
+from pgvector.django import VectorField
 
 
 class Company(models.Model):
@@ -43,6 +44,7 @@ class Job(models.Model):
     company = models.ForeignKey(Company, null=True, blank=True, on_delete=models.SET_NULL)
     company_name = models.CharField(max_length=300, blank=True)
     title = models.CharField(max_length=500)
+    description_fetched_at = models.DateTimeField(null=True, blank=True)
     location = models.CharField(max_length=500, blank=True)
     remote = models.BooleanField(default=False)
     url = models.URLField(max_length=1000)
@@ -52,7 +54,7 @@ class Job(models.Model):
     posted_at = models.DateTimeField(null=True, blank=True)
     fetched_at = models.DateTimeField()
     status = models.CharField(max_length=8, choices=Status.choices, default=Status.OPEN)
-    # embedding (vector) is added in slice 3 with the pgvector Python package
+    embedding = VectorField(dimensions=768, null=True, blank=True)  # Gemini text-embedding-004
 
     class Meta:
         constraints = [  # noqa: RUF012
@@ -80,6 +82,7 @@ class Profile(models.Model):
     work_auth = models.CharField(max_length=100, blank=True)
     notice_period = models.CharField(max_length=50, blank=True)
     links = models.JSONField(default=dict, blank=True)
+    score_threshold = models.PositiveSmallIntegerField(default=70)
 
 
 class JobMatch(models.Model):
@@ -100,3 +103,93 @@ class JobMatch(models.Model):
                 name="uniq_jobmatch_user_job_resume",
             )
         ]
+
+
+class Application(models.Model):
+    class Status(models.TextChoices):
+        INBOX = "inbox"
+        APPROVED = "approved"
+        READY = "ready"
+        APPLIED = "applied"
+        FAILED = "failed"
+        INTERVIEW = "interview"
+        OFFER = "offer"
+        DISMISSED = "dismissed"
+        REJECTED = "rejected"
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="applications",
+    )
+    job = models.ForeignKey(
+        Job,
+        on_delete=models.CASCADE,
+        related_name="applications",
+    )
+    status = models.CharField(
+        max_length=16,
+        choices=Status.choices,
+        default=Status.INBOX,
+    )
+    notes = models.TextField(blank=True)
+    applied_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["user", "job"],
+                name="uniq_application_user_job",
+            )
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(fields=["user", "status"]),
+        ]
+
+    def __str__(self):
+        return f"{self.user_id} - {self.job.title} ({self.status})"
+
+
+class ApplicationEvent(models.Model):
+    class EventType(models.TextChoices):
+        CREATED = "created"
+        STATUS_CHANGED = "status_changed"
+        APPLY_SESSION_CREATED = "apply_session_created"
+        APPLY_SESSION_REVOKED = "apply_session_revoked"
+        DEVICE_CREATED = "device_created"
+        DEVICE_REVOKED = "device_revoked"
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="application_events",
+    )
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        related_name="events",
+        null=True,
+        blank=True,
+    )
+    event_type = models.CharField(
+        max_length=32,
+        choices=EventType.choices,
+    )
+    from_status = models.CharField(max_length=16, blank=True)
+    to_status = models.CharField(max_length=16, blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]  # noqa: RUF012
+        indexes = [  # noqa: RUF012
+            models.Index(fields=["user", "created_at"]),
+            models.Index(fields=["application", "created_at"]),
+        ]
+
+
+class ScrapeLog(models.Model):
+    kind = models.CharField(max_length=20)  # search | description
+    at = models.DateTimeField(auto_now_add=True)

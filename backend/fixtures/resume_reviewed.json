@@ -1,0 +1,62 @@
+{
+  "basics": {
+    "name": "Abdullah Test",
+    "label": "Full-Stack Developer",
+    "email": "test@example.com",
+    "summary": "Full-stack developer with 3 years of experience in Python, Django, React, and TypeScript. Passionate about building scalable web applications."
+  },
+  "work": [
+    {
+      "name": "TechCorp",
+      "position": "Software Engineer",
+      "startDate": "2023-01-01",
+      "endDate": "2026-01-01",
+      "summary": "Built REST APIs with Django and React frontends. Implemented CI/CD pipelines.",
+      "highlights": [
+        "Reduced API response time by 40%",
+        "Led migration to microservices architecture"
+      ]
+    },
+    {
+      "name": "StartupXYZ",
+      "position": "Junior Developer",
+      "startDate": "2021-06-01",
+      "endDate": "2022-12-31",
+      "summary": "Developed features for a job board application using Python and JavaScript."
+    }
+  ],
+  "education": [
+    {
+      "institution": "FAST-NUCES",
+      "area": "Computer Science",
+      "studyType": "BS",
+      "startDate": "2017-09-01",
+      "endDate": "2021-06-01"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Backend",
+      "keywords": ["Python", "Django", "Django REST Framework", "FastAPI", "PostgreSQL", "Redis", "Celery"]
+    },
+    {
+      "name": "Frontend",
+      "keywords": ["React", "TypeScript", "Next.js", "HTML", "CSS", "Tailwind CSS"]
+    },
+    {
+      "name": "DevOps",
+      "keywords": ["Docker", "GitHub Actions", "Linux", "Nginx"]
+    },
+    {
+      "name": "Tools",
+      "keywords": ["Git", "VS Code", "Postman", "pgAdmin"]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Job Board API",
+      "description": "REST API for a job board with filtering, pagination, and search.",
+      "keywords": ["Django", "PostgreSQL", "Redis"]
+    }
+  ]
+}

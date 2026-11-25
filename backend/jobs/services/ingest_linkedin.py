@@ -9,21 +9,21 @@ def ingest_linkedin(term, location="Pakistan", n=50, source=None, scrape=None) -
     now = timezone.now()
     created = updated = 0
     for nj in source.fetch(term, location, n, scrape=scrape):
-        _, c = Job.objects.update_or_create(
-            source="linkedin", external_id=nj.external_id,
-            defaults={
-    "company": None,
-    "company_name": nj.company_name,
-    "title": nj.title,
-    "location": nj.location,
-    "remote": nj.remote,
-    "url": nj.url,
-    "apply_url": nj.apply_url,
-    "description": nj.description,
-    "posted_at": nj.posted_at,
-    "status": Job.Status.OPEN,
-    "fetched_at": now,
-})
+        defaults = {
+            "company": None,
+            "company_name": nj.company_name,
+            "title": nj.title,
+            "location": nj.location,
+            "remote": nj.remote,
+            "url": nj.url,
+            "apply_url": nj.apply_url,
+            "posted_at": nj.posted_at,
+            "status": Job.Status.OPEN,
+            "fetched_at": now,
+        }
+        if nj.description:  # never overwrite a fetched description with an empty one
+            defaults["description"] = nj.description
+        _, c = Job.objects.update_or_create(source="linkedin", external_id=nj.external_id, defaults=defaults)
         created += c
         updated += not c
     return {"created": created, "updated": updated}

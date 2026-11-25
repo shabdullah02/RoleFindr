@@ -51,3 +51,10 @@ def test_remote_in_title_counts_and_skips_location():
     r = check_job(job(title="Engineer - Remote", location="Karāchi, Pakistan"), p)
     assert r.passed
     assert check_job(job(), p).reasons == ["not_remote", "location"]
+
+
+def test_title_ignores_hyphens_and_engineer_vs_developer():
+    p = Profile(titles=["backend developer", "full stack developer"])
+    assert check_job(job(title="Senior Backend Engineer - Full Stack"), p).passed
+    assert check_job(job(title="Senior Full-Stack Engineer (Orbit Console)"), p).passed
+    assert check_job(job(title="Senior Java Developer"), p).reasons == ["title"]

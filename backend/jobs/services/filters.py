@@ -1,3 +1,4 @@
+import re
 import unicodedata
 from dataclasses import dataclass, field
 
@@ -7,6 +8,12 @@ def norm(s: str) -> str:
     s = unicodedata.normalize("NFKD", s or "")
     s = "".join(c for c in s if not unicodedata.combining(c))
     return " ".join(s.casefold().split())
+
+
+def norm_title(s: str) -> str:
+    """Titles only: 'Full-Stack Engineer' and 'full stack developer' compare equal."""
+    s = re.sub(r"[-–—/]", " ", norm(s))
+    return re.sub(r"\bengineers?\b", "developer", s)
 
 
 @dataclass
@@ -19,13 +26,13 @@ def is_remote(job) -> bool:
     return bool(job.remote) or "remote" in norm(job.title)
 
 
-def check_job(job, profile) -> FilterResult:
+def check_job(job, profile, require_description: bool = True) -> FilterResult:
     """Hard filters. Pure function: works on unsaved objects, touches no DB."""
     reasons = []
-    if not (job.description or "").strip():
+    if require_description and not (job.description or "").strip():
         reasons.append("no_description")  # can't be scored; refetch later
 
-    title = norm(job.title)
+    title = norm_title(job.title)
     haystack = norm(f"{job.title} {job.company_name}")  # not the description: too many false hits
     for term in profile.blocklist or []:
         t = norm(term)
@@ -33,7 +40,7 @@ def check_job(job, profile) -> FilterResult:
             reasons.append(f"blocklist:{t}")
             break
 
-    titles = [norm(t) for t in (profile.titles or []) if norm(t)]
+    titles = [norm_title(t) for t in (profile.titles or []) if norm(t)]
     if titles and not any(all(w in title for w in t.split() if len(w) > 2) for t in titles):
         reasons.append("title")
 

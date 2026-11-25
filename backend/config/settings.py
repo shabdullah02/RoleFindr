@@ -42,3 +42,14 @@ CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]  # platform origin only; tighte
 
 CELERY_BROKER_URL = env("REDIS_URL")
 CELERY_TASK_ALWAYS_EAGER = env.bool("CELERY_EAGER", default=False)
+MEDIA_ROOT = BASE_DIR / "media"  # dev only; private S3 bucket later
+MEDIA_URL = "/media/"
+
+# --- Scoring (Slice 3) ---
+GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
+SCORING_TOP_N = env.int("SCORING_TOP_N", default=20)
+SCORING_THRESHOLD = env.int("SCORING_THRESHOLD", default=70)
+
+# --- ResumeIQ ---
+RESUMEIQ_URL = env("RESUMEIQ_URL", default="")
+RESUMEIQ_API_KEY = env("RESUMEIQ_API_KEY", default="")
