@@ -44,6 +44,8 @@ def test_bad_shape_raises():
         parser(R(200, {"nope": 1})).parse("cv.pdf", b"x")
 
 
-def test_unconfigured_raises():
+def test_unconfigured_raises(monkeypatch):
+    monkeypatch.delenv("RESUMEIQ_URL", raising=False)
+    monkeypatch.delenv("RESUMEIQ_API_KEY", raising=False)
     with pytest.raises(ResumeParseError, match="not configured"):
-        ResumeIQParser(base_url="", api_key="").parse("cv.pdf", b"x")
+        ResumeIQParser().parse("resume.pdf", b"test")

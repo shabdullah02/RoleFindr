@@ -4,7 +4,14 @@ from pathlib import Path
 import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 env = environ.Env(DJANGO_DEBUG=(bool, False))
+
+# Load .env from RoleFindr/, one level above backend/
+ENV_FILE = BASE_DIR.parent / ".env"
+
+if ENV_FILE.is_file():
+    environ.Env.read_env(str(ENV_FILE))
 
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 DEBUG = env("DJANGO_DEBUG")
