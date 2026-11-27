@@ -59,4 +59,30 @@ SCORING_THRESHOLD = env.int("SCORING_THRESHOLD", default=70)
 
 # --- ResumeIQ ---
 RESUMEIQ_URL = env("RESUMEIQ_URL", default="")
-RESUMEIQ_API_KEY = env("RESUMEIQ_API_KEY", default="")
+RESUMEIQ_API_KEY = env("RESUMEIQ_API_KEY", default="")  # no trailing comma
+
+# --- Cache and budgets (ADR 0003) ---
+CACHES = {"default": {"BACKEND": "django.core.cache.backends.redis.RedisCache", "LOCATION": env("REDIS_URL")}}
+LINKEDIN_MAX_SEARCHES_PER_DAY = env.int("LINKEDIN_MAX_SEARCHES_PER_DAY", default=3)
+LINKEDIN_MAX_DESCRIPTIONS_PER_DAY = env.int("LINKEDIN_MAX_DESCRIPTIONS_PER_DAY", default=40)
+JOB_SEARCH_MAX_PER_USER_PER_DAY = env.int("JOB_SEARCH_MAX_PER_USER_PER_DAY", default=1)
+JOB_SEARCH_CACHE_SECONDS = 6 * 60 * 60
+LINKEDIN_PROXIES = [p for p in env.list("LINKEDIN_PROXIES", default=[]) if p]
+
+# --- Session auth from the Next.js origin (ADR 0003 item 1) ---
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
+SESSION_COOKIE_SAMESITE = "Lax"
+
+# --- allauth headless [VERIFY keys against the pinned version] ---
+INSTALLED_APPS += ["django.contrib.sites", "allauth", "allauth.account", "allauth.headless"]
+MIDDLEWARE += ["allauth.account.middleware.AccountMiddleware"]
+SITE_ID = 1
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*"]
+HEADLESS_ONLY = True

@@ -1,10 +1,18 @@
+# backend/jobs/services/ingest_linkedin.py
 from django.utils import timezone
 
 from jobs.models import Job
+from jobs.services import budget
 from jobs.sources.linkedin import LinkedInGuestSource
 
 
+class BudgetExceeded(Exception):
+    pass
+
+
 def ingest_linkedin(term, location="Pakistan", n=50, source=None, scrape=None) -> dict:
+    if not budget.consume("search"):
+        raise BudgetExceeded("daily LinkedIn search budget used up")
     source = source or LinkedInGuestSource()
     now = timezone.now()
     created = updated = 0

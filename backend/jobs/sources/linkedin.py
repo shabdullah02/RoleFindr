@@ -2,6 +2,7 @@ import os
 import re
 from datetime import UTC, datetime, time
 
+from django.conf import settings
 import pandas as pd
 
 from .base import NormalizedJob
@@ -22,13 +23,12 @@ class LinkedInGuestSource:
               fetch_description=False) -> list[NormalizedJob]:
         if scrape is None:
             from jobspy import scrape_jobs as scrape
-        proxies = [x for x in os.environ.get("LINKEDIN_PROXIES", "").split(",") if x] or None
         df = scrape(site_name=["linkedin"], search_term=term, location=location,
                     results_wanted=n, linkedin_fetch_description=fetch_description,
-                    proxies=proxies, verbose=1)
-        if df is None or len(df) == 0:
-            raise LinkedInBlocked("no results: likely blocked (429) or empty search; do not retry immediately")
-        return [j for j in map(self._normalize, df.to_dict("records")) if j]
+                    proxies=settings.LINKEDIN_PROXIES or None, verbose=1)
+        if df is None:  # empty frame is valid; None is an error
+            raise LinkedInBlocked("scrape returned None")
+        return [j for j in map(self._normalize, df.to_dict("records")) if j is not None]
 
     @staticmethod
     def _normalize(r) -> NormalizedJob | None:

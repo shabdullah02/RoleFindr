@@ -1,16 +1,19 @@
-# backend/requirements.txt  (pin exact versions after `pip install`; verify current releases)
+# backend/requirements.txt  (pin exact versions after install; verify current releases)
 Django>=5.1,<5.3
 djangorestframework
 django-environ
 django-cors-headers
+django-allauth[headless]
 psycopg[binary]
 celery[redis]
+redis
 gunicorn
 pytest
 pytest-django
 ruff
 requests
-
-python-jobspy
+beautifulsoup4
+pandas
+python-jobspy       # MIT per spec [VERIFY]
 pgvector
 google-genai
